@@ -60,7 +60,7 @@ impl fmt::Display for AbiItem {
                             .join(", ")
                     })
                     .unwrap_or_default();
-                write!(f, "constructor({})", params)
+                write!(f, "constructor({params})")
             }
             "event" => {
                 let params = self
@@ -116,7 +116,7 @@ impl fmt::Display for AbiItem {
                         let output_params = outputs
                             .iter()
                             .map(|o| {
-                                let has_name = o.name.as_ref().map_or(false, |n| !n.is_empty());
+                                let has_name = o.name.as_ref().is_some_and(|n| !n.is_empty());
                                 if has_name {
                                     format!("{} {}", o.r#type, o.name.as_ref().unwrap())
                                 } else {
@@ -125,7 +125,7 @@ impl fmt::Display for AbiItem {
                             })
                             .collect::<Vec<_>>()
                             .join(", ");
-                        format!(" returns ({})", output_params)
+                        format!(" returns ({output_params})")
                     } else {
                         String::new()
                     }
@@ -134,7 +134,7 @@ impl fmt::Display for AbiItem {
                 };
 
                 let vis = if visibility != "nonpayable" {
-                    format!(" {}", visibility)
+                    format!(" {visibility}")
                 } else {
                     String::new()
                 };
@@ -154,7 +154,7 @@ impl fmt::Display for AbiItem {
                 } else {
                     ""
                 };
-                write!(f, "fallback() external{}", payable)
+                write!(f, "fallback() external{payable}")
             }
             "receive" => {
                 write!(f, "receive() external payable")

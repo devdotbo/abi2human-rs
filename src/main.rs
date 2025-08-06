@@ -10,12 +10,12 @@ use std::env;
 use std::path::Path;
 use std::process;
 
-const VERSION: &str = "1.0.0";
+const VERSION: &str = "1.0.2";
 
 fn print_help() {
     println!(
         r#"
-abi2human v{} - Convert Ethereum ABI to human-readable format
+abi2human v{VERSION} - Convert Ethereum ABI to human-readable format
 Optimized for AI agents to efficiently consume smart contract interfaces
 
 USAGE:
@@ -51,8 +51,7 @@ EXAMPLES:
 
 FOR AI AGENTS:
   This tool helps you read Ethereum ABIs efficiently without consuming excessive tokens.
-"#,
-        VERSION
+"#
     );
 }
 
@@ -126,7 +125,7 @@ impl CliArgs {
             i += 1;
         }
 
-        if positionals.len() > 0 {
+        if !positionals.is_empty() {
             cli_args.input = Some(positionals[0].clone());
         }
         if positionals.len() > 1 {
@@ -146,13 +145,13 @@ fn main() {
     }
 
     if args.version {
-        println!("abi2human v{}", VERSION);
+        println!("abi2human v{VERSION}");
         process::exit(0);
     }
 
     let log = |msg: &str| {
         if !args.quiet {
-            eprintln!("{}", msg);
+            eprintln!("{msg}");
         }
     };
 
@@ -160,7 +159,7 @@ fn main() {
         let input_path = Path::new(&input);
 
         if !input_path.exists() {
-            eprintln!("Error: Input path '{}' does not exist", input);
+            eprintln!("Error: Input path '{input}' does not exist");
             process::exit(1);
         }
 
@@ -204,67 +203,65 @@ fn main() {
                 }
                 process::exit(1);
             }
-        } else {
-            if args.stdout {
-                let content = match std::fs::read_to_string(input_path) {
-                    Ok(c) => c,
-                    Err(e) => {
-                        eprintln!("Error reading file: {}", e);
-                        process::exit(1);
-                    }
-                };
-
-                let abi_items = match Converter::parse_abi_content(&content) {
-                    Ok(items) => items,
-                    Err(e) => {
-                        eprintln!("Error parsing ABI: {}", e);
-                        process::exit(1);
-                    }
-                };
-
-                if abi_items.is_empty() {
-                    eprintln!("Error: No valid ABI found in file");
+        } else if args.stdout {
+            let content = match std::fs::read_to_string(input_path) {
+                Ok(c) => c,
+                Err(e) => {
+                    eprintln!("Error reading file: {e}");
                     process::exit(1);
                 }
+            };
 
-                let human_readable = Converter::convert_to_human_readable(&abi_items);
+            let abi_items = match Converter::parse_abi_content(&content) {
+                Ok(items) => items,
+                Err(e) => {
+                    eprintln!("Error parsing ABI: {e}");
+                    process::exit(1);
+                }
+            };
 
-                if args.raw {
-                    for item in human_readable {
-                        println!("{}", item);
-                    }
-                } else {
-                    let formatted = Converter::format_as_json_array(&human_readable, args.pretty);
-                    print!("{}", formatted);
-                    if args.pretty {
-                        println!();
-                    }
+            if abi_items.is_empty() {
+                eprintln!("Error: No valid ABI found in file");
+                process::exit(1);
+            }
+
+            let human_readable = Converter::convert_to_human_readable(&abi_items);
+
+            if args.raw {
+                for item in human_readable {
+                    println!("{item}");
                 }
             } else {
-                let output_path = args.output.as_ref().map(|s| Path::new(s));
-                let result = convert_file(input_path, output_path, &options);
-
-                if result.success {
-                    if let Some(output) = result.output_path {
-                        log(&format!(
-                            "✅ Converted {} → {} ({} items)",
-                            result.input_path.display(),
-                            output.display(),
-                            result.item_count.unwrap_or(0)
-                        ));
-                    }
-                } else {
-                    if let Some(error) = result.error {
-                        eprintln!("❌ Error: {}", error);
-                    }
-                    process::exit(1);
+                let formatted = Converter::format_as_json_array(&human_readable, args.pretty);
+                print!("{formatted}");
+                if args.pretty {
+                    println!();
                 }
+            }
+        } else {
+            let output_path = args.output.as_ref().map(Path::new);
+            let result = convert_file(input_path, output_path, &options);
+
+            if result.success {
+                if let Some(output) = result.output_path {
+                    log(&format!(
+                        "✅ Converted {} → {} ({} items)",
+                        result.input_path.display(),
+                        output.display(),
+                        result.item_count.unwrap_or(0)
+                    ));
+                }
+            } else {
+                if let Some(error) = result.error {
+                    eprintln!("❌ Error: {error}");
+                }
+                process::exit(1);
             }
         }
     } else {
         let options = ConvertOptions::default();
         if let Err(e) = convert_stdin_to_stdout(&options) {
-            eprintln!("Error: {}", e);
+            eprintln!("Error: {e}");
             process::exit(1);
         }
     }

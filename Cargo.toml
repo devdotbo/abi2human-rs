@@ -1,6 +1,6 @@
 [package]
 name = "abi2human"
-version = "1.0.0"
+version = "1.0.2"
 edition = "2021"
 authors = ["Your Name <your.email@example.com>"]
 description = "Zero-dependency CLI tool to convert Ethereum ABI JSON to human-readable format"

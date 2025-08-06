@@ -339,7 +339,7 @@ impl JsonParser {
             self.advance();
             Ok(())
         } else {
-            Err(format!("Expected '{}'", expected))
+            Err(format!("Expected '{expected}'"))
         }
     }
 }

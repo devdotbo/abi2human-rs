@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2025-01-06
+
+### Fixed
+- Fixed all Clippy warnings for better code quality
+- Fixed uninlined format arguments throughout the codebase
+- Fixed collapsible if statements for cleaner code
+- Fixed redundant closures
+- Replaced `map_or` with `is_some_and` for better readability
+- Fixed module inception in tests.rs
+- Changed `len() > 0` to `!is_empty()` for idiomatic Rust
+
+### Changed
+- Improved code formatting and style consistency
+- Enhanced error messages with inline format strings
+
+## [1.0.1] - 2025-01-06
+
+### Added
+- Prepared for crates.io publishing
+- Added comprehensive README documentation
+
 ## [1.0.0] - 2025-01-06
 
 ### Added
@@ -25,5 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multiple output format options
 - Human-readable function and event signatures
 
-[Unreleased]: https://github.com/yourusername/abi2human-rs/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/yourusername/abi2human-rs/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/yourusername/abi2human-rs/compare/v1.0.1...v1.0.2
+[1.0.1]: https://github.com/yourusername/abi2human-rs/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/yourusername/abi2human-rs/releases/tag/v1.0.0

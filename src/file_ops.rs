@@ -39,7 +39,7 @@ pub fn convert_file(
                 input_path: input_path.to_path_buf(),
                 output_path: output_path.map(|p| p.to_path_buf()),
                 success: false,
-                error: Some(format!("Failed to read file: {}", e)),
+                error: Some(format!("Failed to read file: {e}")),
                 item_count: None,
             };
         }
@@ -52,7 +52,7 @@ pub fn convert_file(
                 input_path: input_path.to_path_buf(),
                 output_path: output_path.map(|p| p.to_path_buf()),
                 success: false,
-                error: Some(format!("Failed to parse ABI: {}", e)),
+                error: Some(format!("Failed to parse ABI: {e}")),
                 item_count: None,
             };
         }
@@ -91,7 +91,7 @@ pub fn convert_file(
                     input_path: input_path.to_path_buf(),
                     output_path: Some(final_output_path),
                     success: false,
-                    error: Some(format!("Failed to create directory: {}", e)),
+                    error: Some(format!("Failed to create directory: {e}")),
                     item_count: Some(human_readable.len()),
                 };
             }
@@ -110,7 +110,7 @@ pub fn convert_file(
             input_path: input_path.to_path_buf(),
             output_path: Some(final_output_path),
             success: false,
-            error: Some(format!("Failed to write file: {}", e)),
+            error: Some(format!("Failed to write file: {e}")),
             item_count: Some(human_readable.len()),
         },
     }
@@ -130,7 +130,7 @@ pub fn convert_directory(
                 input_path: input_dir.to_path_buf(),
                 output_path: None,
                 success: false,
-                error: Some(format!("Failed to read directory: {}", e)),
+                error: Some(format!("Failed to read directory: {e}")),
                 item_count: None,
             });
             return results;
@@ -198,10 +198,8 @@ fn matches_pattern(filename: &str, pattern: &str) -> bool {
     let mut filename_pos = 0;
 
     for (i, part) in pattern_parts.iter().enumerate() {
-        if part.is_empty() {
-            if i == 0 || i == pattern_parts.len() - 1 {
-                continue;
-            }
+        if part.is_empty() && (i == 0 || i == pattern_parts.len() - 1) {
+            continue;
         }
 
         if let Some(pos) = filename[filename_pos..].find(part) {
