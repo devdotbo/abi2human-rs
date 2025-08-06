@@ -7,7 +7,6 @@ mod tests;
 use std::env;
 use std::path::Path;
 use std::process;
-use std::io::{self, Write};
 use file_ops::{ConvertOptions, convert_file, convert_directory, convert_stdin_to_stdout};
 use converter::Converter;
 
