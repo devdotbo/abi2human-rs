@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::abi::{AbiItem, AbiInput, AbiOutput};
+    use crate::abi::{AbiInput, AbiItem, AbiOutput};
     use crate::converter::Converter;
     use crate::json_parser::JsonParser;
 
@@ -20,7 +20,7 @@ mod tests {
         let mut parser = JsonParser::new(json);
         let result = parser.parse_abi();
         assert!(result.is_ok());
-        
+
         let items = result.unwrap();
         assert_eq!(items.len(), 1);
         assert_eq!(items[0].name.as_ref().unwrap(), "transfer");
@@ -47,14 +47,12 @@ mod tests {
                     components: None,
                 },
             ]),
-            outputs: Some(vec![
-                AbiOutput {
-                    name: None,
-                    r#type: "bool".to_string(),
-                    internal_type: None,
-                    components: None,
-                },
-            ]),
+            outputs: Some(vec![AbiOutput {
+                name: None,
+                r#type: "bool".to_string(),
+                internal_type: None,
+                components: None,
+            }]),
             state_mutability: Some("nonpayable".to_string()),
             anonymous: None,
             payable: None,
@@ -62,7 +60,10 @@ mod tests {
         };
 
         let formatted = item.to_string();
-        assert_eq!(formatted, "function transfer(address to, uint256 amount) returns (bool)");
+        assert_eq!(
+            formatted,
+            "function transfer(address to, uint256 amount) returns (bool)"
+        );
     }
 
     #[test]
@@ -101,7 +102,10 @@ mod tests {
         };
 
         let formatted = item.to_string();
-        assert_eq!(formatted, "event Transfer(address indexed from, address indexed to, uint256 value)");
+        assert_eq!(
+            formatted,
+            "event Transfer(address indexed from, address indexed to, uint256 value)"
+        );
     }
 
     #[test]
@@ -109,15 +113,13 @@ mod tests {
         let item = AbiItem {
             r#type: "constructor".to_string(),
             name: None,
-            inputs: Some(vec![
-                AbiInput {
-                    name: Some("initialSupply".to_string()),
-                    r#type: "uint256".to_string(),
-                    indexed: None,
-                    internal_type: None,
-                    components: None,
-                },
-            ]),
+            inputs: Some(vec![AbiInput {
+                name: Some("initialSupply".to_string()),
+                r#type: "uint256".to_string(),
+                indexed: None,
+                internal_type: None,
+                components: None,
+            }]),
             outputs: None,
             state_mutability: None,
             anonymous: None,
@@ -180,7 +182,7 @@ mod tests {
         let mut parser = JsonParser::new(json);
         let result = parser.parse_abi();
         assert!(result.is_ok());
-        
+
         let items = result.unwrap();
         assert_eq!(items.len(), 1);
         assert_eq!(items[0].name.as_ref().unwrap(), "balanceOf");
@@ -188,44 +190,43 @@ mod tests {
 
     #[test]
     fn test_convert_to_human_readable() {
-        let items = vec![
-            AbiItem {
-                r#type: "function".to_string(),
-                name: Some("approve".to_string()),
-                inputs: Some(vec![
-                    AbiInput {
-                        name: Some("spender".to_string()),
-                        r#type: "address".to_string(),
-                        indexed: None,
-                        internal_type: None,
-                        components: None,
-                    },
-                    AbiInput {
-                        name: Some("value".to_string()),
-                        r#type: "uint256".to_string(),
-                        indexed: None,
-                        internal_type: None,
-                        components: None,
-                    },
-                ]),
-                outputs: Some(vec![
-                    AbiOutput {
-                        name: None,
-                        r#type: "bool".to_string(),
-                        internal_type: None,
-                        components: None,
-                    },
-                ]),
-                state_mutability: Some("nonpayable".to_string()),
-                anonymous: None,
-                payable: None,
-                constant: None,
-            },
-        ];
+        let items = vec![AbiItem {
+            r#type: "function".to_string(),
+            name: Some("approve".to_string()),
+            inputs: Some(vec![
+                AbiInput {
+                    name: Some("spender".to_string()),
+                    r#type: "address".to_string(),
+                    indexed: None,
+                    internal_type: None,
+                    components: None,
+                },
+                AbiInput {
+                    name: Some("value".to_string()),
+                    r#type: "uint256".to_string(),
+                    indexed: None,
+                    internal_type: None,
+                    components: None,
+                },
+            ]),
+            outputs: Some(vec![AbiOutput {
+                name: None,
+                r#type: "bool".to_string(),
+                internal_type: None,
+                components: None,
+            }]),
+            state_mutability: Some("nonpayable".to_string()),
+            anonymous: None,
+            payable: None,
+            constant: None,
+        }];
 
         let readable = Converter::convert_to_human_readable(&items);
         assert_eq!(readable.len(), 1);
-        assert_eq!(readable[0], "function approve(address spender, uint256 value) returns (bool)");
+        assert_eq!(
+            readable[0],
+            "function approve(address spender, uint256 value) returns (bool)"
+        );
     }
 
     #[test]
@@ -236,7 +237,10 @@ mod tests {
         ];
 
         let formatted = Converter::format_as_json_array(&items, false);
-        assert_eq!(formatted, r#"["function transfer(address to, uint256 amount) returns (bool)","event Transfer(address indexed from, address indexed to, uint256 value)"]"#);
+        assert_eq!(
+            formatted,
+            r#"["function transfer(address to, uint256 amount) returns (bool)","event Transfer(address indexed from, address indexed to, uint256 value)"]"#
+        );
     }
 
     #[test]
@@ -244,23 +248,19 @@ mod tests {
         let item = AbiItem {
             r#type: "function".to_string(),
             name: Some("balanceOf".to_string()),
-            inputs: Some(vec![
-                AbiInput {
-                    name: Some("account".to_string()),
-                    r#type: "address".to_string(),
-                    indexed: None,
-                    internal_type: None,
-                    components: None,
-                },
-            ]),
-            outputs: Some(vec![
-                AbiOutput {
-                    name: None,
-                    r#type: "uint256".to_string(),
-                    internal_type: None,
-                    components: None,
-                },
-            ]),
+            inputs: Some(vec![AbiInput {
+                name: Some("account".to_string()),
+                r#type: "address".to_string(),
+                indexed: None,
+                internal_type: None,
+                components: None,
+            }]),
+            outputs: Some(vec![AbiOutput {
+                name: None,
+                r#type: "uint256".to_string(),
+                internal_type: None,
+                components: None,
+            }]),
             state_mutability: Some("view".to_string()),
             anonymous: None,
             payable: None,
@@ -268,7 +268,10 @@ mod tests {
         };
 
         let formatted = item.to_string();
-        assert_eq!(formatted, "function balanceOf(address account) view returns (uint256)");
+        assert_eq!(
+            formatted,
+            "function balanceOf(address account) view returns (uint256)"
+        );
     }
 
     #[test]

@@ -1,4 +1,4 @@
-use crate::abi::{AbiItem, AbiInput, AbiOutput};
+use crate::abi::{AbiInput, AbiItem, AbiOutput};
 use std::collections::HashMap;
 
 pub struct JsonParser {
@@ -16,7 +16,7 @@ impl JsonParser {
 
     pub fn parse_abi(&mut self) -> Result<Vec<AbiItem>, String> {
         self.skip_whitespace();
-        
+
         if self.current() == Some('[') {
             self.parse_abi_array()
         } else if self.current() == Some('{') {
@@ -38,7 +38,7 @@ impl JsonParser {
 
     fn convert_to_abi_items(&self, arr: &[Value]) -> Result<Vec<AbiItem>, String> {
         let mut items = Vec::new();
-        
+
         for value in arr {
             if let Value::Object(obj) = value {
                 if let Some(item) = self.convert_to_abi_item(obj) {
@@ -46,13 +46,13 @@ impl JsonParser {
                 }
             }
         }
-        
+
         Ok(items)
     }
 
     fn convert_to_abi_item(&self, obj: &HashMap<String, Value>) -> Option<AbiItem> {
         let r#type = obj.get("type")?.as_string()?;
-        
+
         Some(AbiItem {
             r#type,
             name: obj.get("name").and_then(|v| v.as_string()),
@@ -83,13 +83,15 @@ impl JsonParser {
 
     fn convert_to_input(&self, obj: &HashMap<String, Value>) -> Option<AbiInput> {
         let r#type = obj.get("type")?.as_string()?;
-        
+
         Some(AbiInput {
             name: obj.get("name").and_then(|v| v.as_string()),
             r#type,
             indexed: obj.get("indexed").and_then(|v| v.as_bool()),
             internal_type: obj.get("internalType").and_then(|v| v.as_string()),
-            components: obj.get("components").and_then(|v| self.convert_to_inputs(v)),
+            components: obj
+                .get("components")
+                .and_then(|v| self.convert_to_inputs(v)),
         })
     }
 
@@ -111,18 +113,20 @@ impl JsonParser {
 
     fn convert_to_output(&self, obj: &HashMap<String, Value>) -> Option<AbiOutput> {
         let r#type = obj.get("type")?.as_string()?;
-        
+
         Some(AbiOutput {
             name: obj.get("name").and_then(|v| v.as_string()),
             r#type,
             internal_type: obj.get("internalType").and_then(|v| v.as_string()),
-            components: obj.get("components").and_then(|v| self.convert_to_outputs(v)),
+            components: obj
+                .get("components")
+                .and_then(|v| self.convert_to_outputs(v)),
         })
     }
 
     fn parse_value(&mut self) -> Result<Value, String> {
         self.skip_whitespace();
-        
+
         match self.current() {
             Some('"') => self.parse_string(),
             Some('[') => Ok(Value::Array(self.parse_array()?)),
@@ -137,17 +141,17 @@ impl JsonParser {
     fn parse_array(&mut self) -> Result<Vec<Value>, String> {
         self.expect('[')?;
         let mut arr = Vec::new();
-        
+
         self.skip_whitespace();
         if self.current() == Some(']') {
             self.advance();
             return Ok(arr);
         }
-        
+
         loop {
             arr.push(self.parse_value()?);
             self.skip_whitespace();
-            
+
             if self.current() == Some(',') {
                 self.advance();
                 self.skip_whitespace();
@@ -158,33 +162,33 @@ impl JsonParser {
                 return Err("Expected ',' or ']' in array".to_string());
             }
         }
-        
+
         Ok(arr)
     }
 
     fn parse_object(&mut self) -> Result<HashMap<String, Value>, String> {
         self.expect('{')?;
         let mut obj = HashMap::new();
-        
+
         self.skip_whitespace();
         if self.current() == Some('}') {
             self.advance();
             return Ok(obj);
         }
-        
+
         loop {
             self.skip_whitespace();
             let key = match self.parse_string()? {
                 Value::String(s) => s,
                 _ => return Err("Expected string key".to_string()),
             };
-            
+
             self.skip_whitespace();
             self.expect(':')?;
-            
+
             let value = self.parse_value()?;
             obj.insert(key, value);
-            
+
             self.skip_whitespace();
             if self.current() == Some(',') {
                 self.advance();
@@ -195,14 +199,14 @@ impl JsonParser {
                 return Err("Expected ',' or '}' in object".to_string());
             }
         }
-        
+
         Ok(obj)
     }
 
     fn parse_string(&mut self) -> Result<Value, String> {
         self.expect('"')?;
         let mut string = String::new();
-        
+
         while self.position < self.input.len() {
             match self.current() {
                 Some('"') => {
@@ -245,18 +249,18 @@ impl JsonParser {
                 None => return Err("Unterminated string".to_string()),
             }
         }
-        
+
         Err("Unterminated string".to_string())
     }
 
     fn parse_number(&mut self) -> Result<Value, String> {
         let mut num_str = String::new();
-        
+
         if self.current() == Some('-') {
             num_str.push('-');
             self.advance();
         }
-        
+
         while let Some(c) = self.current() {
             if c.is_ascii_digit() || c == '.' || c == 'e' || c == 'E' || c == '+' || c == '-' {
                 num_str.push(c);
@@ -265,13 +269,15 @@ impl JsonParser {
                 break;
             }
         }
-        
+
         if num_str.contains('.') || num_str.contains('e') || num_str.contains('E') {
-            num_str.parse::<f64>()
+            num_str
+                .parse::<f64>()
                 .map(Value::Float)
                 .map_err(|_| "Invalid number".to_string())
         } else {
-            num_str.parse::<i64>()
+            num_str
+                .parse::<i64>()
                 .map(Value::Int)
                 .map_err(|_| "Invalid number".to_string())
         }
@@ -298,7 +304,7 @@ impl JsonParser {
     fn consume_word(&mut self, word: &str) -> bool {
         let chars: Vec<char> = word.chars().collect();
         let start = self.position;
-        
+
         for expected in chars {
             if self.current() != Some(expected) {
                 self.position = start;
@@ -306,7 +312,7 @@ impl JsonParser {
             }
             self.advance();
         }
-        
+
         true
     }
 
@@ -339,6 +345,7 @@ impl JsonParser {
 }
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 enum Value {
     String(String),
     Int(i64),

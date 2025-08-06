@@ -4,16 +4,17 @@ mod file_ops;
 mod json_parser;
 mod tests;
 
+use converter::Converter;
+use file_ops::{convert_directory, convert_file, convert_stdin_to_stdout, ConvertOptions};
 use std::env;
 use std::path::Path;
 use std::process;
-use file_ops::{ConvertOptions, convert_file, convert_directory, convert_stdin_to_stdout};
-use converter::Converter;
 
 const VERSION: &str = "1.0.0";
 
 fn print_help() {
-    println!(r#"
+    println!(
+        r#"
 abi2human v{} - Convert Ethereum ABI to human-readable format
 Optimized for AI agents to efficiently consume smart contract interfaces
 
@@ -50,7 +51,9 @@ EXAMPLES:
 
 FOR AI AGENTS:
   This tool helps you read Ethereum ABIs efficiently without consuming excessive tokens.
-"#, VERSION);
+"#,
+        VERSION
+    );
 }
 
 struct CliArgs {
@@ -89,7 +92,7 @@ impl CliArgs {
 
         while i < args.len() {
             let arg = &args[i];
-            
+
             if arg.starts_with('-') {
                 match arg.as_str() {
                     "-h" | "--help" => cli_args.help = true,
@@ -155,7 +158,7 @@ fn main() {
 
     if let Some(input) = args.input {
         let input_path = Path::new(&input);
-        
+
         if !input_path.exists() {
             eprintln!("Error: Input path '{}' does not exist", input);
             process::exit(1);
@@ -174,16 +177,22 @@ fn main() {
                 input_path.join("readable")
             };
 
-            log(&format!("🔄 Converting ABI files from {} to {}", 
-                input_path.display(), output_dir.display()));
+            log(&format!(
+                "🔄 Converting ABI files from {} to {}",
+                input_path.display(),
+                output_dir.display()
+            ));
 
             let results = convert_directory(input_path, &output_dir, &options);
-            
+
             let successful: Vec<_> = results.iter().filter(|r| r.success).collect();
             let failed: Vec<_> = results.iter().filter(|r| !r.success).collect();
 
             if !successful.is_empty() {
-                log(&format!("✅ Successfully converted {} files", successful.len()));
+                log(&format!(
+                    "✅ Successfully converted {} files",
+                    successful.len()
+                ));
             }
 
             if !failed.is_empty() {
@@ -219,7 +228,7 @@ fn main() {
                 }
 
                 let human_readable = Converter::convert_to_human_readable(&abi_items);
-                
+
                 if args.raw {
                     for item in human_readable {
                         println!("{}", item);
@@ -234,13 +243,15 @@ fn main() {
             } else {
                 let output_path = args.output.as_ref().map(|s| Path::new(s));
                 let result = convert_file(input_path, output_path, &options);
-                
+
                 if result.success {
                     if let Some(output) = result.output_path {
-                        log(&format!("✅ Converted {} → {} ({} items)",
+                        log(&format!(
+                            "✅ Converted {} → {} ({} items)",
                             result.input_path.display(),
                             output.display(),
-                            result.item_count.unwrap_or(0)));
+                            result.item_count.unwrap_or(0)
+                        ));
                     }
                 } else {
                     if let Some(error) = result.error {

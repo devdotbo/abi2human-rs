@@ -11,9 +11,7 @@ impl Converter {
 
     pub fn convert_to_human_readable(abi: &[AbiItem]) -> Vec<String> {
         abi.iter()
-            .filter(|item| {
-                !item.r#type.is_empty() && item.r#type != "unknown"
-            })
+            .filter(|item| !item.r#type.is_empty() && item.r#type != "unknown")
             .map(|item| item.to_string())
             .filter(|formatted| !formatted.is_empty() && !formatted.starts_with("{}"))
             .collect()
@@ -48,7 +46,8 @@ fn format_json_pretty(strings: &[String]) -> String {
 }
 
 fn format_json_compact(strings: &[String]) -> String {
-    let escaped: Vec<String> = strings.iter()
+    let escaped: Vec<String> = strings
+        .iter()
         .map(|s| format!("\"{}\"", escape_json_string(s)))
         .collect();
     format!("[{}]", escaped.join(","))

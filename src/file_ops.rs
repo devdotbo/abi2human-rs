@@ -1,7 +1,7 @@
-use std::fs;
-use std::path::{Path, PathBuf};
-use std::io::{self, Read, Write};
 use crate::converter::Converter;
+use std::fs;
+use std::io::{self, Read, Write};
+use std::path::{Path, PathBuf};
 
 pub struct ConvertOptions {
     pub suffix: String,
@@ -75,7 +75,8 @@ pub fn convert_file(
         path.to_path_buf()
     } else {
         let mut path = input_path.to_path_buf();
-        let stem = path.file_stem()
+        let stem = path
+            .file_stem()
             .and_then(|s| s.to_str())
             .unwrap_or("output");
         let new_name = format!("{}{}.json", stem, options.suffix);
@@ -138,7 +139,7 @@ pub fn convert_directory(
 
     for entry in entries.filter_map(Result::ok) {
         let path = entry.path();
-        
+
         if path.is_file() {
             if let Some(ext) = path.extension() {
                 if ext == "json" {
@@ -152,10 +153,9 @@ pub fn convert_directory(
                         }
                     }
 
-                    let relative = path.strip_prefix(input_dir)
-                        .unwrap_or(&path);
+                    let relative = path.strip_prefix(input_dir).unwrap_or(&path);
                     let output_path = output_dir.join(relative);
-                    
+
                     results.push(convert_file(&path, Some(&output_path), options));
                 }
             }
@@ -190,20 +190,20 @@ pub fn convert_stdin_to_stdout(options: &ConvertOptions) -> io::Result<()> {
 
 fn matches_pattern(filename: &str, pattern: &str) -> bool {
     let pattern_parts: Vec<&str> = pattern.split('*').collect();
-    
+
     if pattern_parts.is_empty() {
         return true;
     }
 
     let mut filename_pos = 0;
-    
+
     for (i, part) in pattern_parts.iter().enumerate() {
         if part.is_empty() {
             if i == 0 || i == pattern_parts.len() - 1 {
                 continue;
             }
         }
-        
+
         if let Some(pos) = filename[filename_pos..].find(part) {
             filename_pos += pos + part.len();
         } else {

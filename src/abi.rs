@@ -5,7 +5,9 @@ pub struct AbiInput {
     pub name: Option<String>,
     pub r#type: String,
     pub indexed: Option<bool>,
+    #[allow(dead_code)]
     pub internal_type: Option<String>,
+    #[allow(dead_code)]
     pub components: Option<Vec<AbiInput>>,
 }
 
@@ -13,7 +15,9 @@ pub struct AbiInput {
 pub struct AbiOutput {
     pub name: Option<String>,
     pub r#type: String,
+    #[allow(dead_code)]
     pub internal_type: Option<String>,
+    #[allow(dead_code)]
     pub components: Option<Vec<AbiOutput>>,
 }
 
@@ -24,8 +28,11 @@ pub struct AbiItem {
     pub inputs: Option<Vec<AbiInput>>,
     pub outputs: Option<Vec<AbiOutput>>,
     pub state_mutability: Option<String>,
+    #[allow(dead_code)]
     pub anonymous: Option<bool>,
+    #[allow(dead_code)]
     pub payable: Option<bool>,
+    #[allow(dead_code)]
     pub constant: Option<bool>,
 }
 
@@ -36,9 +43,12 @@ impl fmt::Display for AbiItem {
 
         match type_str.as_str() {
             "constructor" => {
-                let params = self.inputs.as_ref()
+                let params = self
+                    .inputs
+                    .as_ref()
                     .map(|inputs| {
-                        inputs.iter()
+                        inputs
+                            .iter()
                             .map(|p| {
                                 if let Some(name) = &p.name {
                                     format!("{} {}", p.r#type, name)
@@ -53,9 +63,12 @@ impl fmt::Display for AbiItem {
                 write!(f, "constructor({})", params)
             }
             "event" => {
-                let params = self.inputs.as_ref()
+                let params = self
+                    .inputs
+                    .as_ref()
                     .map(|inputs| {
-                        inputs.iter()
+                        inputs
+                            .iter()
                             .map(|p| {
                                 let indexed = if p.indexed.unwrap_or(false) {
                                     " indexed"
@@ -72,12 +85,20 @@ impl fmt::Display for AbiItem {
                             .join(", ")
                     })
                     .unwrap_or_default();
-                write!(f, "event {}({})", self.name.as_ref().unwrap_or(&String::new()), params)
+                write!(
+                    f,
+                    "event {}({})",
+                    self.name.as_ref().unwrap_or(&String::new()),
+                    params
+                )
             }
             "function" => {
-                let params = self.inputs.as_ref()
+                let params = self
+                    .inputs
+                    .as_ref()
                     .map(|inputs| {
-                        inputs.iter()
+                        inputs
+                            .iter()
                             .map(|p| {
                                 if let Some(name) = &p.name {
                                     format!("{} {}", p.r#type, name)
@@ -89,10 +110,11 @@ impl fmt::Display for AbiItem {
                             .join(", ")
                     })
                     .unwrap_or_default();
-                
+
                 let returns = if let Some(outputs) = &self.outputs {
                     if !outputs.is_empty() {
-                        let output_params = outputs.iter()
+                        let output_params = outputs
+                            .iter()
                             .map(|o| {
                                 let has_name = o.name.as_ref().map_or(false, |n| !n.is_empty());
                                 if has_name {
@@ -117,11 +139,14 @@ impl fmt::Display for AbiItem {
                     String::new()
                 };
 
-                write!(f, "function {}({}){}{}", 
-                    self.name.as_ref().unwrap_or(&String::new()), 
-                    params, 
-                    vis, 
-                    returns)
+                write!(
+                    f,
+                    "function {}({}){}{}",
+                    self.name.as_ref().unwrap_or(&String::new()),
+                    params,
+                    vis,
+                    returns
+                )
             }
             "fallback" => {
                 let payable = if visibility == "payable" {
