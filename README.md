@@ -1,5 +1,7 @@
 # abi2human
 
+[![Publish to crates.io](https://github.com/devdotbo/abi2human-rs/actions/workflows/publish.yml/badge.svg)](https://github.com/devdotbo/abi2human-rs/actions/workflows/publish.yml)
+
 A zero-dependency Rust implementation for converting Ethereum ABI to human-readable format.
 
 ## Features
@@ -12,6 +14,14 @@ A zero-dependency Rust implementation for converting Ethereum ABI to human-reada
 - ⚡ **Fast**: Optimized Rust performance
 
 ## Installation
+
+### From crates.io (Recommended)
+
+```bash
+cargo install abi2human
+```
+
+### Build from Source
 
 ```bash
 cargo build --release
