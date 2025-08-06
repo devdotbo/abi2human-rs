@@ -15,7 +15,17 @@ A zero-dependency Rust implementation for converting Ethereum ABI to human-reada
 
 ## Installation
 
-### From crates.io (Recommended)
+### Homebrew (macOS/Linux)
+
+```bash
+# Add the tap
+brew tap devdotbo/abi2human
+
+# Install abi2human
+brew install abi2human
+```
+
+### From crates.io
 
 ```bash
 cargo install abi2human
