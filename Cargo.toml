@@ -1,6 +1,13 @@
 [package]
-name = "abi2human-rs"
-version = "0.1.0"
-edition = "2024"
+name = "abi2human"
+version = "1.0.0"
+edition = "2021"
+authors = ["Your Name"]
+description = "Convert Ethereum ABI to human-readable format"
+license = "MIT"
+
+[[bin]]
+name = "abi2human"
+path = "src/main.rs"
 
 [dependencies]
